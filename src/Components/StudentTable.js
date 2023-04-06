@@ -25,6 +25,7 @@ export const StudentTable = () => {
     const columns = useMemo(()=> (students[0])? Object.keys(students[0]).map((key) => {
         return {
             Header: capitalizeFirstLetter(key.replaceAll("_", " ")),
+            Footer: capitalizeFirstLetter(key.replaceAll("_", " ")),
             accessor: key
         }
     }):[],[students]);
@@ -36,6 +37,7 @@ export const StudentTable = () => {
     const {getTableProps,
     getTableBodyProps,
     headerGroups,
+    footerGroups,
     rows,
     prepareRow,
     } = TableInstance
@@ -71,6 +73,17 @@ export const StudentTable = () => {
                 }
 
             </tbody>
+            <tfoot>
+                {
+                    footerGroups.map(footerGroup => (
+                        <tr {...footerGroup.getFooterGroupProps()}>
+                            {footerGroup.headers.map(column => (
+                                <td {...column.getFooterProps()}>{column.render("Footer")}</td>
+                            ))}
+                        </tr>
+                    ))
+                }
+            </tfoot>
          </table>
         </div>
     )
