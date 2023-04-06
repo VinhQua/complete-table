@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import './table.css';
 import axios from "axios";
 import { useSortBy, useTable } from "react-table";
+import {format} from 'date-fns'
 function capitalizeFirstLetter(str) {
     var splitStr = str.toLowerCase().split(' ');
     for (var i = 0; i < splitStr.length; i++) {
@@ -23,6 +24,14 @@ export const StudentTable = () => {
    }
     }
     const columns = useMemo(()=> (students[0])? Object.keys(students[0]).map((key) => {
+        if (key === "date_of_birth") {
+            return {
+                Header: capitalizeFirstLetter(key.replaceAll("_", " ")),
+                Footer: capitalizeFirstLetter(key.replaceAll("_", " ")),
+                accessor: key,
+                Cell: ({value}) => {return format(new Date(value), "dd/MM/yyyy")}
+            }
+        }
         return {
             Header: capitalizeFirstLetter(key.replaceAll("_", " ")),
             Footer: capitalizeFirstLetter(key.replaceAll("_", " ")),
