@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import './table.css';
 import axios from "axios";
-import { useTable } from "react-table";
+import { useSortBy, useTable } from "react-table";
 function capitalizeFirstLetter(str) {
     var splitStr = str.toLowerCase().split(' ');
     for (var i = 0; i < splitStr.length; i++) {
@@ -30,7 +30,7 @@ export const StudentTable = () => {
         }
     }):[],[students]);
     const data = useMemo(()=> [...students],[students] )
-    const TableInstance = useTable({columns,data});
+    const TableInstance = useTable({columns,data},useSortBy);
     console.log(columns);
     useEffect(()=>{
     fetchStudents()}, []);
@@ -49,8 +49,9 @@ export const StudentTable = () => {
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {
                     headerGroup.headers.map(column => (
-                        <th {...column.getHeaderProps()}>
+                        <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                             {column.render("Header")}
+                            <span>{column.isSorted? column.isSortedDesc? "▼" : "▲" : ""}</span>
                         </th>  
                     ))
                 }
