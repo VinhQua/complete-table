@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import './table.css';
 import axios from "axios";
-import { useSortBy, useTable } from "react-table";
+import { useSortBy, useTable,useGlobalFilter } from "react-table";
 import {format} from 'date-fns'
+import { GlobalFilter } from "./GlobalFilter";
 function capitalizeFirstLetter(str) {
     var splitStr = str.toLowerCase().split(' ');
     for (var i = 0; i < splitStr.length; i++) {
@@ -39,7 +40,7 @@ export const StudentTable = () => {
         }
     }):[],[students]);
     const data = useMemo(()=> [...students],[students] )
-    const TableInstance = useTable({columns,data},useSortBy);
+    const TableInstance = useTable({columns,data},useGlobalFilter, useSortBy);
     console.log(columns);
     useEffect(()=>{
     fetchStudents()}, []);
@@ -48,10 +49,14 @@ export const StudentTable = () => {
     headerGroups,
     footerGroups,
     rows,
+    state,
+    setGlobalFilter,
     prepareRow,
     } = TableInstance
+    const {globalFilter} = state
     return (
         <div className="container">
+        <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter}/>
          <table {...getTableProps()}>
             <thead>
                 {headerGroups.map(headerGroup => (
