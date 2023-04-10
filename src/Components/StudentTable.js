@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import './table.css';
 import axios from "axios";
-import { useSortBy, useTable,useGlobalFilter } from "react-table";
+import { useSortBy, useTable,useGlobalFilter, useFilters } from "react-table";
 import {format} from 'date-fns'
-import { GlobalFilter } from "./GlobalFilter";
+import {  GlobalFilter } from "./GlobalFilter";
+import { ColumnsFilter } from "./ColumnsFilter";
+
 function capitalizeFirstLetter(str) {
     var splitStr = str.toLowerCase().split(' ');
     for (var i = 0; i < splitStr.length; i++) {
@@ -30,17 +32,19 @@ export const StudentTable = () => {
                 Header: capitalizeFirstLetter(key.replaceAll("_", " ")),
                 Footer: capitalizeFirstLetter(key.replaceAll("_", " ")),
                 accessor: key,
-                Cell: ({value}) => {return format(new Date(value), "dd/MM/yyyy")}
+                Cell: ({value}) => {return format(new Date(value), "dd/MM/yyyy")},
+                Filter: ColumnsFilter
             }
         }
         return {
             Header: capitalizeFirstLetter(key.replaceAll("_", " ")),
             Footer: capitalizeFirstLetter(key.replaceAll("_", " ")),
-            accessor: key
+            accessor: key,
+            Filter: ColumnsFilter
         }
     }):[],[students]);
     const data = useMemo(()=> [...students],[students] )
-    const TableInstance = useTable({columns,data},useGlobalFilter, useSortBy);
+    const TableInstance = useTable({columns,data},useFilters, useGlobalFilter, useSortBy);
     console.log(columns);
     useEffect(()=>{
     fetchStudents()}, []);
@@ -66,6 +70,7 @@ export const StudentTable = () => {
                         <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                             {column.render("Header")}
                             <span>{column.isSorted? column.isSortedDesc? "▼" : "▲" : ""}</span>
+                            <div>{column.canFilter? column.render('Filter'):null}</div>
                         </th>  
                     ))
                 }
