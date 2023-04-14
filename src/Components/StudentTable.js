@@ -44,7 +44,13 @@ export const StudentTable = () => {
         }
     }):[],[students]);
     const data = useMemo(()=> [...students],[students] )
-    const TableInstance = useTable({columns,data},useFilters, useGlobalFilter, useSortBy,usePagination);
+    const TableInstance = useTable({columns,
+        data,
+        initialState:{pageIndex:0}}
+        ,useFilters, 
+        useGlobalFilter, 
+        useSortBy,
+        usePagination);
     console.log(columns);
     useEffect(()=>{
     fetchStudents()}, []);
@@ -57,6 +63,8 @@ export const StudentTable = () => {
     canNextPage,
     canPreviousPage,
     pageOptions,
+    gotoPage,
+    pageCount,
     state,
     setGlobalFilter,
     prepareRow,
@@ -106,8 +114,17 @@ export const StudentTable = () => {
                     {pageIndex + 1} of {pageOptions.length}
                 </strong>{' '}
             </span>
+            <span>
+                | Go to page:{' '}
+                <input type="number" defaultChecked={pageIndex + 1} onChange={e=>{
+                    const pageNumber = e.target.value? e.target.value - 1 : 0
+                    gotoPage(pageNumber)
+                }} style={{width:'50px'}}/>
+            </span>
+            <button onClick={()=>gotoPage(0)} disabled={!canPreviousPage}>{'<<'}</button>
             <button onClick={()=>previousPage()} disabled={!canPreviousPage}>Previous</button>
             <button onClick={()=>nextPage()} disabled={!canNextPage}>Next</button>
+            <button onClick={()=>gotoPage(pageCount-1)} disabled={!canNextPage}>{'>>'}</button>
          </div>
         </div>
     )
