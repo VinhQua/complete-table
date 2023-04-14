@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import './table.css';
 import axios from "axios";
-import { useSortBy, useTable,useGlobalFilter, useFilters } from "react-table";
+import { useSortBy, useTable,useGlobalFilter, useFilters,usePagination } from "react-table";
 import {format} from 'date-fns'
 import {  GlobalFilter } from "./GlobalFilter";
 import { ColumnsFilter } from "./ColumnsFilter";
@@ -44,20 +44,25 @@ export const StudentTable = () => {
         }
     }):[],[students]);
     const data = useMemo(()=> [...students],[students] )
-    const TableInstance = useTable({columns,data},useFilters, useGlobalFilter, useSortBy);
+    const TableInstance = useTable({columns,data},useFilters, useGlobalFilter, useSortBy,usePagination);
     console.log(columns);
     useEffect(()=>{
     fetchStudents()}, []);
     const {getTableProps,
     getTableBodyProps,
     headerGroups,
-    footerGroups,
-    rows,
+    page,
+    nextPage,
+    previousPage,
+    canNextPage,
+    canPreviousPage,
+    pageOptions,
     state,
     setGlobalFilter,
     prepareRow,
     } = TableInstance
     const {globalFilter} = state
+    const {pageIndex}= state
     return (
         <div className="container">
         <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter}/>
@@ -70,7 +75,7 @@ export const StudentTable = () => {
                         <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                             {column.render("Header")}
                             <span>{column.isSorted? column.isSortedDesc? "▼" : "▲" : ""}</span>
-                            <div>{column.canFilter? column.render('Filter'):null}</div>
+                            {/* <div>{column.canFilter? column.render('Filter'):null}</div> */}
                         </th>  
                     ))
                 }
@@ -80,7 +85,7 @@ export const StudentTable = () => {
             </thead>
             <tbody {...getTableBodyProps()}>
                 {
-                    rows.map((row, i) => {
+                    page.map((row, i) => {
                         prepareRow(row)
                         return (
                             <tr {...row.getRowProps()}>
@@ -93,18 +98,17 @@ export const StudentTable = () => {
                 }
 
             </tbody>
-            <tfoot>
-                {
-                    footerGroups.map(footerGroup => (
-                        <tr {...footerGroup.getFooterGroupProps()}>
-                            {footerGroup.headers.map(column => (
-                                <td {...column.getFooterProps()}>{column.render("Footer")}</td>
-                            ))}
-                        </tr>
-                    ))
-                }
-            </tfoot>
          </table>
+         <div>
+            <span>
+                Page{' '}
+                <strong>
+                    {pageIndex + 1} of {pageOptions.length}
+                </strong>{' '}
+            </span>
+            <button onClick={()=>previousPage()} disabled={!canPreviousPage}>Previous</button>
+            <button onClick={()=>nextPage()} disabled={!canNextPage}>Next</button>
+         </div>
         </div>
     )
     
