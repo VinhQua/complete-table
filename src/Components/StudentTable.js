@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import './table.css';
 import axios from "axios";
-import { useSortBy, useTable,useGlobalFilter, useFilters,usePagination } from "react-table";
+import { useSortBy, useTable,useGlobalFilter, useFilters,usePagination, useRowSelect } from "react-table";
 import {format} from 'date-fns'
 import {  GlobalFilter } from "./GlobalFilter";
 import { ColumnsFilter } from "./ColumnsFilter";
+import { CheckBox } from "./CheckBox";
 
 function capitalizeFirstLetter(str) {
     var splitStr = str.toLowerCase().split(' ');
@@ -50,7 +51,24 @@ export const StudentTable = () => {
         ,useFilters, 
         useGlobalFilter, 
         useSortBy,
-        usePagination);
+        usePagination,
+        useRowSelect,
+        (hooks)=>{
+            hooks.visibleColumns.push((columns)=>{
+                return [
+                    {
+                        id:'selection',
+                        Header: ({getToggleAllRowsSelectedProps}) => (
+                            <CheckBox {...getToggleAllRowsSelectedProps()}/>
+                        ),
+                        Cell: ({row}) => (
+                            <CheckBox {...row.getToggleRowSelectedProps()} type="checkbox"/>
+                        )
+                    },
+                    ...columns
+                ]
+            });
+        });
     console.log(columns);
     useEffect(()=>{
     fetchStudents()}, []);
@@ -69,6 +87,7 @@ export const StudentTable = () => {
     state,
     setGlobalFilter,
     prepareRow,
+    selectedFlatRows,
     } = TableInstance
     const {globalFilter} = state
     const {pageIndex, pageSize}= state
@@ -107,7 +126,19 @@ export const StudentTable = () => {
                 }
 
             </tbody>
+
          </table>
+            <pre>
+                <code>
+                    {JSON.stringify(
+                        {
+                            selectedFlatRows: selectedFlatRows.map(row => row.original),
+                        },
+                        null,
+                        2
+                    )}
+                </code>
+            </pre>
          <div>
             <span>
                 Page{' '}
