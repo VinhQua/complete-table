@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import './table.css';
 import axios from "axios";
-import { useSortBy, useTable,useGlobalFilter, useFilters,usePagination, useRowSelect } from "react-table";
+import { useSortBy, useTable,useGlobalFilter, useFilters,usePagination, useRowSelect, useColumnOrder } from "react-table";
 import {format} from 'date-fns'
 import {  GlobalFilter } from "./GlobalFilter";
 import { ColumnsFilter } from "./ColumnsFilter";
@@ -51,6 +51,7 @@ export const StudentTable = () => {
         ,useFilters, 
         useGlobalFilter, 
         useSortBy,
+        useColumnOrder,
         usePagination,
         useRowSelect,
         (hooks)=>{
@@ -87,12 +88,18 @@ export const StudentTable = () => {
     state,
     setGlobalFilter,
     prepareRow,
+    setColumnOrder,
     selectedFlatRows,
     } = TableInstance
     const {globalFilter} = state
     const {pageIndex, pageSize}= state
+    const ChangeOrder = () => {
+        console.log(columns.map(column => column.accessor).sort())
+        setColumnOrder(columns.map(column => column.accessor).sort())
+    }
     return (
         <div className="container">
+            <button onClick={ChangeOrder}>Change Column Order</button>
         <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter}/>
          <table {...getTableProps()}>
             <thead>
