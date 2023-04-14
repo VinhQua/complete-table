@@ -88,6 +88,8 @@ export const StudentTable = () => {
     state,
     setGlobalFilter,
     prepareRow,
+    allColumns,
+    getToggleHideAllColumnsProps,
     setColumnOrder,
     selectedFlatRows,
     } = TableInstance
@@ -99,6 +101,22 @@ export const StudentTable = () => {
     }
     return (
         <div className="container">
+            <div>
+                <div>
+                    <CheckBox {...getToggleHideAllColumnsProps()}/> Toggle All
+                </div>
+                {
+                    allColumns.map(column=>(
+                        <div key={column.id}>
+                            <label>
+                                <CheckBox type="checkbox" {...column.getToggleHiddenProps()}/>
+                                {column.Header}
+                            </label>
+                        </div>
+                    ))
+                }
+            </div>
+
             <button onClick={ChangeOrder}>Change Column Order</button>
         <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter}/>
          <table {...getTableProps()}>
