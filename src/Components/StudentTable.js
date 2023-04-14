@@ -65,12 +65,13 @@ export const StudentTable = () => {
     pageOptions,
     gotoPage,
     pageCount,
+    setPageSize,
     state,
     setGlobalFilter,
     prepareRow,
     } = TableInstance
     const {globalFilter} = state
-    const {pageIndex}= state
+    const {pageIndex, pageSize}= state
     return (
         <div className="container">
         <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter}/>
@@ -121,6 +122,15 @@ export const StudentTable = () => {
                     gotoPage(pageNumber)
                 }} style={{width:'50px'}}/>
             </span>
+            <select value={pageSize} onChange={e=> setPageSize(Number(e.target.value))}>
+                {
+                    [10, 25, 50 ].map(pageSize => (
+                        <option key={pageSize} value={pageSize}>
+                            Show {pageSize}
+                        </option>
+                    ))
+                }
+            </select>
             <button onClick={()=>gotoPage(0)} disabled={!canPreviousPage}>{'<<'}</button>
             <button onClick={()=>previousPage()} disabled={!canPreviousPage}>Previous</button>
             <button onClick={()=>nextPage()} disabled={!canNextPage}>Next</button>
