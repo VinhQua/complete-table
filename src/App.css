@@ -36,3 +36,33 @@
     transform: rotate(360deg);
   }
 }
+.panel-btn{
+  position:absolute;
+  top: 1rem;
+  left: 1rem;
+  
+}
+.hide{
+  transform: scale(0);
+}
+.container{
+  position: relative;
+}
+.columns-panel{
+  display: flex;
+  align-content: flex-start;
+  align-items: flex-start;
+  flex-flow: column nowrap;
+  position: absolute;
+  transition: all 0.2s ease;
+  top: 0rem;
+  left: 1rem;
+  z-index: 10;
+}
+.columns-panel > div{
+  background-color: whitesmoke;
+  display: flex;
+  align-content: flex-start;
+  align-items: flex-start;
+  flex-flow: column nowrap;
+}

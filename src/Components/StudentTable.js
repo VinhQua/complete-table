@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import './table.css';
 import axios from "axios";
-import { useSortBy, useTable,useGlobalFilter, useFilters,usePagination, useRowSelect, useColumnOrder } from "react-table";
+import { useSortBy, useTable,useGlobalFilter, useFilters,usePagination, useRowSelect, useColumnOrder, useBlockLayout } from "react-table";
 import {format} from 'date-fns'
 import {  GlobalFilter } from "./GlobalFilter";
 import { ColumnsFilter } from "./ColumnsFilter";
 import { CheckBox } from "./CheckBox";
-
+import { useSticky } from "react-table-sticky";
+import styled from "styled-components";
+import TableStyle from "./TableStyle";
 function capitalizeFirstLetter(str) {
     var splitStr = str.toLowerCase().split(' ');
     for (var i = 0; i < splitStr.length; i++) {
@@ -19,6 +21,7 @@ function capitalizeFirstLetter(str) {
 }
 export const StudentTable = () => {
    const [students, setStudents] = useState([]);
+   const [isActive, setIsActive] = useState(false);
    const fetchStudents = async () => {
     const response = await axios.get("http://localhost:3000/database/Student_info.json")
     .catch(err => console.log(err));
@@ -34,7 +37,9 @@ export const StudentTable = () => {
                 Footer: capitalizeFirstLetter(key.replaceAll("_", " ")),
                 accessor: key,
                 Cell: ({value}) => {return format(new Date(value), "dd/MM/yyyy")},
-                Filter: ColumnsFilter
+                Filter: ColumnsFilter,
+                stick:'left',
+            
             }
         }
         return {
@@ -54,6 +59,7 @@ export const StudentTable = () => {
         useColumnOrder,
         usePagination,
         useRowSelect,
+        useBlockLayout,
         (hooks)=>{
             hooks.visibleColumns.push((columns)=>{
                 return [
@@ -69,7 +75,8 @@ export const StudentTable = () => {
                     ...columns
                 ]
             });
-        });
+        },
+        useSticky);
     console.log(columns);
     useEffect(()=>{
     fetchStudents()}, []);
@@ -99,60 +106,72 @@ export const StudentTable = () => {
         console.log(columns.map(column => column.accessor).sort())
         setColumnOrder(columns.map(column => column.accessor).sort())
     }
+    const hideToggle=() => {
+        const value =!isActive
+        setIsActive(value)
+    }
     return (
         <div className="container">
-            <div>
-                <div>
-                    <CheckBox {...getToggleHideAllColumnsProps()}/> Toggle All
+            
+            <div className="columns-panel" >
+                <button className="pannel-btn" onClick={hideToggle}>Column Panel</button>
+                <div className={isActive? 'hide':''} >
+                    <div>
+                        <CheckBox {...getToggleHideAllColumnsProps()}/> Toggle All
+                    </div>
+                    {
+                        allColumns.map(column=>(
+                            <div key={column.id}>
+                                <label>
+                                    <CheckBox type="checkbox" {...column.getToggleHiddenProps()}/>
+                                    {column.Header}
+                                </label>
+                            </div>
+                        ))
+                    }
                 </div>
-                {
-                    allColumns.map(column=>(
-                        <div key={column.id}>
-                            <label>
-                                <CheckBox type="checkbox" {...column.getToggleHiddenProps()}/>
-                                {column.Header}
-                            </label>
-                        </div>
-                    ))
-                }
             </div>
 
             <button onClick={ChangeOrder}>Change Column Order</button>
         <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter}/>
-         <table {...getTableProps()}>
-            <thead>
+        <TableStyle>
+
+
+         <div className="table sticky" {...getTableProps()} style={{width:"100%",height:500}}>
+            <div className="header">
                 {headerGroups.map(headerGroup => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
+              <div {...headerGroup.getHeaderGroupProps()} className="tr">
                 {
                     headerGroup.headers.map(column => (
-                        <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                        <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th">
                             {column.render("Header")}
                             <span>{column.isSorted? column.isSortedDesc? "▼" : "▲" : ""}</span>
                             {/* <div>{column.canFilter? column.render('Filter'):null}</div> */}
-                        </th>  
+                        </div>  
                     ))
                 }
                 
-              </tr>  
+              </div>  
               ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
+            </div>
+            <div {...getTableBodyProps()} className="body">
                 {
                     page.map((row, i) => {
                         prepareRow(row)
                         return (
-                            <tr {...row.getRowProps()}>
+                            <div {...row.getRowProps()} className="tr">
                                 {row.cells.map(cell => {
-                                    return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                                    return <div {...cell.getCellProps()} className="td">{cell.render("Cell")}</div>
                                 })}
-                            </tr>
+                            </div>
                         )
                     })
                 }
 
-            </tbody>
+            </div>
 
-         </table>
+         </div>
+         </TableStyle>
             <pre>
                 <code>
                     {JSON.stringify(
@@ -193,6 +212,7 @@ export const StudentTable = () => {
             <button onClick={()=>gotoPage(pageCount-1)} disabled={!canNextPage}>{'>>'}</button>
          </div>
         </div>
+
     )
     
 }
