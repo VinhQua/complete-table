@@ -23,7 +23,7 @@ export const StudentTable = () => {
    const [students, setStudents] = useState([]);
    const [isActive, setIsActive] = useState(false);
    const fetchStudents = async () => {
-    const response = await axios.get("http://localhost:3000/database/Student_info.json")
+    const response = await axios.get("https://vinhqua.github.io/complete-table/database/Student_info.json")
     .catch(err => console.log(err));
     if (response) {
         //console.log(response.data);
